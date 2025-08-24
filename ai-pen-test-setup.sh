@@ -1,3 +1,4 @@
+cat > ai-pen-test-setup.sh <<'EOF'
 #!/usr/bin/env bash
 # ai-pen-test-setup.sh
 # Purpose: Trim a Cubic Ubuntu image and install/categorize AI pen-testing tools.
@@ -93,10 +94,10 @@ echo "[*] Creating CLI wrappers in /usr/local/bin ..."
 make_wrapper () {
   local cmd_name="$1"; shift
   local target="$*"
-  cat >/usr/local/bin/${cmd_name} <<EOF
+  cat >/usr/local/bin/${cmd_name} <<EOF2
 #!/usr/bin/env bash
 exec /opt/ai-pt/venv/bin/${target} "\$@"
-EOF
+EOF2
   chmod +x /usr/local/bin/${cmd_name}
 }
 
@@ -116,7 +117,7 @@ echo "[*] Creating desktop entries..."
 mkdir -p /usr/share/applications
 create_desktop () {
   local file="$1" name="$2" comment="$3" exec_line="$4"
-  cat >"/usr/share/applications/${file}" <<EOF
+  cat >"/usr/share/applications/${file}" <<EOF2
 [Desktop Entry]
 Name=${name}
 Comment=${comment}
@@ -125,7 +126,7 @@ Icon=utilities-terminal
 Terminal=true
 Type=Application
 Categories=Security;Education;Development;
-EOF
+EOF2
 }
 
 create_desktop "garak.desktop" "Garak — LLM Vulnerability Scanner" \
@@ -150,7 +151,7 @@ create_desktop "textattack.desktop" "TextAttack — NLP Attacks" \
 
 # Optional (experimental) Vigil-LLM launcher
 if [[ -f /opt/ai-pt/vigil-llm/vigil-server.py ]]; then
-  cat >"/usr/share/applications/vigil-llm.desktop" <<'EOF'
+  cat >"/usr/share/applications/vigil-llm.desktop" <<'EOF2'
 [Desktop Entry]
 Name=Vigil-LLM — Prompt Injection Scanner (Experimental)
 Comment=Detect LLM prompt injections and jailbreaks using Vigil
@@ -159,21 +160,21 @@ Icon=utilities-terminal
 Terminal=true
 Type=Application
 Categories=Security;Education;Development;
-EOF
+EOF2
 fi
 
 update-desktop-database || true
 
 # ---------- 8) Category folder (best-effort; not all DEs surface custom menus) ----------
 mkdir -p /usr/share/desktop-directories /etc/xdg/menus/applications-merged
-cat >/usr/share/desktop-directories/ai-pen-testing.directory <<'EOF'
+cat >/usr/share/desktop-directories/ai-pen-testing.directory <<'EOF2'
 [Desktop Entry]
 Name=AI Pen Testing
 Icon=applications-science
 Type=Directory
-EOF
+EOF2
 
-cat >/etc/xdg/menus/applications-merged/ai-pen-testing.menu <<'EOF'
+cat >/etc/xdg/menus/applications-merged/ai-pen-testing.menu <<'EOF2'
 <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
  "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
 <Menu>
@@ -186,7 +187,7 @@ cat >/etc/xdg/menus/applications-merged/ai-pen-testing.menu <<'EOF'
     </Include>
   </Menu>
 </Menu>
-EOF
+EOF2
 
 # ---------- 9) Post-cleanup ----------
 echo "[*] Final cleanup..."
@@ -199,3 +200,6 @@ echo "Tools installed in /opt/ai-pt/venv and exposed via:"
 echo "  - garak, counterfit, textattack, modelscan, promptfoo"
 echo "Menu entries added under 'AI Pen Testing' (where supported)."
 echo "===================================================================="
+EOF
+
+chmod +x ai-pen-test-setup.sh
