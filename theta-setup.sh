@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Exit on any error
+set -e
+
+# Function to check if command executed successfully
+check_status() {
+    if [ $? -ne 0 ]; then
+        echo "Error: $1 failed. Exiting."
+        exit 1
+    fi
+}
+
+# Update package lists
+echo "Updating package lists..."
+sudo apt-get update
+check_status "Package list update"
+
+# Remove unnecessary packages and clean up
+echo "Removing unwanted packages and cleaning up..."
+sudo apt-get autoremove -y
+check_status "Package autoremove"
+sudo apt-get autoclean
+check_status "Package autoclean"
+
+# Install essential tools for penetration testing
+echo "Installing penetration testing tools..."
+sudo apt-get install -y nmap aircrack-ng metasploit-framework sqlmap python3-pip
+check_status "Installation of penetration testing tools"
+
+# Install additional AI-driven tools via pip (example: DeepExploit, if available)
+echo "Installing AI-driven pentesting tools via pip..."
+pip3 install --user git+https://github.com/13o-bbr-bbq/DeepExploit.git || {
+    echo "Warning: DeepExploit installation failed. Check repository or dependencies."
+}
+
+# Install OWASP ZAP (AI-enhanced features in some configurations)
+echo "Installing OWASP ZAP..."
+sudo apt-get install -y zaproxy
+check_status "OWASP ZAP installation"
+
+# Verify installations
+echo "Verifying installed tools..."
+for tool in nmap aircrack-ng msfconsole sqlmap zaproxy; do
+    if command -v "$tool" &>/dev/null; then
+        echo "$tool is installed."
+    else
+        echo "Warning: $tool is not installed."
+    fi
+done
+
+# Clean up package cache
+echo "Cleaning up package cache..."
+sudo apt-get clean
+check_status "Package cache cleanup"
+
+echo "Installation complete! Penetration testing tools are ready."
